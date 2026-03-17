@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planificator Concediu 2026</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f7f6; color: #333; padding: 20px; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #2c3e50; }
+        .section { margin-bottom: 20px; padding: 15px; border-bottom: 1px solid #eee; }
+        label { font-weight: bold; display: block; margin-bottom: 10px; }
+        .options { display: flex; flex-wrap: wrap; gap: 10px; }
+        .option { background: #ebf2ff; padding: 8px 15px; border-radius: 20px; cursor: pointer; border: 2px solid transparent; transition: 0.3s; }
+        input[type="checkbox"] { display: none; }
+        input[type="checkbox"]:checked + span { background: #3498db; color: white; border-color: #2980b9; }
+        .btn { display: block; width: 100%; padding: 15px; background: #27ae60; color: white; border: none; border-radius: 8px; font-size: 18px; cursor: pointer; margin-top: 20px; }
+        .btn:hover { background: #219150; }
+        #results { margin-top: 30px; background: #2c3e50; color: white; padding: 20px; border-radius: 10px; display: none; }
+        .result-item { margin-bottom: 10px; font-size: 18px; }
+        .winner { color: #2ecc71; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>✈️ Unde mergem în concediu?</h1>
+    
+    <div class="section">
+        <label>Numele tău:</label>
+        <input type="text" id="userName" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ddd;" placeholder="Ex: Ionut">
+    </div>
+
+    <div class="section">
+        <label>1. Destinația (alege oricâte):</label>
+        <div class="options">
+            <label class="option"><input type="checkbox" name="dest" value="Grecia"><span>Grecia</span></label>
+            <label class="option"><input type="checkbox" name="dest" value="Albania"><span>Albania</span></label>
+            <label class="option"><input type="checkbox" name="dest" value="Croatia"><span>Croația</span></label>
+            <label class="option"><input type="checkbox" name="dest" value="Malta"><span>Malta</span></label>
+        </div>
+    </div>
+
+    <div class="section">
+        <label>2. Cum ajungem?</label>
+        <div class="options">
+            <label class="option"><input type="checkbox" name="trans" value="Masina"><span>Mașină</span></label>
+            <label class="option"><input type="checkbox" name="trans" value="Avion"><span>Avion</span></label>
+        </div>
+    </div>
+
+    <div class="section">
+        <label>3. Tipul de cazare:</label>
+        <div class="options">
+            <label class="option"><input type="checkbox" name="cazare" value="Vila Izolata"><span>Vilă în mijlocul naturii</span></label>
+            <label class="option"><input type="checkbox" name="cazare" value="Aproape de oras"><span>Aproape de oraș/taverne</span></label>
+        </div>
+    </div>
+
+    <div class="section">
+        <label>4. Mobilitate acolo:</label>
+        <div class="options">
+            <label class="option"><input type="checkbox" name="mobil" value="Masina Proprie"><span>Folosim mașina proprie</span></label>
+            <label class="option"><input type="checkbox" name="mobil" value="Doar zona cazarii"><span>Stăm în zona cazării</span></label>
+            <label class="option"><input type="checkbox" name="mobil" value="Inchiriere 3 zile"><span>Închiriem mașină 3 zile</span></label>
+            <label class="option"><input type="checkbox" name="mobil" value="Inchiriere Full"><span>Închiriem mașină toată perioada</span></label>
+        </div>
+    </div>
+
+    <div class="section">
+        <label>5. Buget (Cazare + Avion + Mașină):</label>
+        <div class="options">
+            <label class="option"><input type="checkbox" name="buget" value="300-500$"><span>300-500$</span></label>
+            <label class="option"><input type="checkbox" name="buget" value="500-700$"><span>500-700$</span></label>
+            <label class="option"><input type="checkbox" name="buget" value="700$+"><span>700$+</span></label>
+        </div>
+    </div>
+
+    <button class="btn" onclick="submitVote()">Trimite Votul</button>
+
+    <div id="results">
+        <h2>📊 Rezultate Grup (Live)</h2>
+        <div id="summary"></div>
+    </div>
+</div>
+
+<script>
+    let allVotes = JSON.parse(localStorage.getItem('tripVotes')) || [];
+
+    function submitVote() {
+        const name = document.getElementById('userName').value;
+        if(!name) { alert("Pune-ți numele!"); return; }
+
+        const vote = {
+            name: name,
+            dest: Array.from(document.querySelectorAll('input[name="dest"]:checked')).map(el => el.value),
+            trans: Array.from(document.querySelectorAll('input[name="trans"]:checked')).map(el => el.value),
+            cazare: Array.from(document.querySelectorAll('input[name="cazare"]:checked')).map(el => el.value),
+            mobil: Array.from(document.querySelectorAll('input[name="mobil"]:checked')).map(el => el.value),
+            buget: Array.from(document.querySelectorAll('input[name="buget"]:checked')).map(el => el.value)
+        };
+
+        allVotes.push(vote);
+        localStorage.setItem('tripVotes', JSON.stringify(allVotes));
+        calculateWinner();
+    }
+
+    function calculateWinner() {
+        const resultsDiv = document.getElementById('results');
+        const summaryDiv = document.getElementById('summary');
+        resultsDiv.style.display = 'block';
+
+        const getWinner = (key) => {
+            const counts = {};
+            allVotes.forEach(v => v[key].forEach(val => counts[val] = (counts[val] || 0) + 1));
+            return Object.entries(counts).sort((a,b) => b[1] - a[1])[0]?.[0] || "N/A";
+        };
+
+        summaryDiv.innerHTML = `
+            <div class="result-item">🌍 Destinația Favorită: <span class="winner">${getWinner('dest')}</span></div>
+            <div class="result-item">🚗 Transport: <span class="winner">${getWinner('trans')}</span></div>
+            <div class="result-item">🏠 Stil Cazare: <span class="winner">${getWinner('cazare')}</span></div>
+            <div class="result-item">📍 Mobilitate: <span class="winner">${getWinner('mobil')}</span></div>
+            <div class="result-item">💰 Buget Majoritar: <span class="winner">${getWinner('buget')}</span></div>
+            <p style="font-size: 12px; margin-top: 20px;">Voturi totale: ${allVotes.length}</p>
+        `;
+    }
+
+    // Arată rezultatele dacă există deja voturi
+    if(allVotes.length > 0) calculateWinner();
+</script>
+
+</body>
+</html>
