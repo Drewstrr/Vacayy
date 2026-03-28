@@ -3,217 +3,233 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zakynthos 2026 - Itinerariu Oficial</title>
+    <title>Zakynthos 2026 - Itinerariu Complet</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=Playfair+Display:wght@900&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #F8FAFC; color: #1E293B; }
-        .day-content { display: none; }
-        .day-content.active { display: block; animation: fadeIn 0.4s ease-out; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .active-tab { border-bottom: 2px solid #2563eb; color: #2563eb; }
+        .day-panel { display: none; }
+        .day-panel.active { display: block; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .tab-section { display: none; }
-        .tab-section.active { display: block; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        .glass-card { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.5); }
-        .btn-day-active { background: #0077B6 !important; color: white !important; box-shadow: 0 10px 15px -3px rgba(0, 119, 182, 0.3); transform: scale(1.05); }
     </style>
 </head>
-<body class="antialiased">
+<body class="bg-slate-50 text-slate-900">
 
-    <div class="max-w-md mx-auto min-h-screen flex flex-col bg-white shadow-2xl border-x relative">
-        
-        <header class="relative h-64 bg-[#001D3D] flex flex-col justify-end p-8 text-white overflow-hidden">
-            <div class="absolute inset-0 bg-gradient-to-t from-[#001D3D] via-transparent to-transparent z-10"></div>
-            <div class="absolute inset-0 opacity-40 bg-[url('https://www.transparenttextures.com/patterns/az-subtle.png')] z-0"></div>
-            
-            <div class="relative z-20">
-                <span class="inline-block px-3 py-1 rounded-full bg-blue-500/20 border border-blue-400/30 text-[10px] font-black uppercase tracking-[0.2em] mb-3 text-blue-300">Iunie 2026</span>
-                <h1 style="font-family: 'Playfair Display'" class="text-5xl leading-none italic">Zante <span class="text-blue-400">Crew</span></h1>
-                <div class="flex items-center gap-4 mt-4 text-[11px] font-bold opacity-80 uppercase tracking-widest">
-                    <span class="flex items-center gap-1"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg> 10 Persoane</span>
-                    <span class="flex items-center gap-1"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg> Kalamaki</span>
+    <div class="max-w-md mx-auto bg-white min-h-screen shadow-xl flex flex-col border-x border-slate-200">
+        <div class="relative h-64 bg-slate-900 overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&q=80&w=800" class="absolute inset-0 w-full h-full object-cover opacity-60" alt="Zakynthos">
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-900 to-transparent"></div>
+            <div class="absolute bottom-6 left-6 text-white">
+                <div class="flex items-center gap-2 mb-2">
+                    <span class="bg-blue-600 text-[10px] font-bold px-2 py-1 rounded-md uppercase tracking-wider">Iunie 2026</span>
                 </div>
+                <h1 class="text-4xl font-extrabold tracking-tight">Zante Crew</h1>
+                <p class="text-slate-300 text-sm mt-1 flex items-center gap-1">
+                    <i data-lucide="users" class="w-4 h-4"></i> 10 Persoane • GodGuard Official
+                </p>
             </div>
-        </header>
+        </div>
 
-        <nav class="flex border-b sticky top-0 bg-white/90 backdrop-blur-md z-50">
-            <button onclick="switchSection('plan')" id="nav-plan" class="flex-1 py-4 text-[10px] font-black uppercase tracking-widest border-b-2 border-blue-600 text-blue-600 transition-all">Itinerariu</button>
-            <button onclick="switchSection('budget')" id="nav-budget" class="flex-1 py-4 text-[10px] font-black uppercase tracking-widest border-b-2 border-transparent text-gray-400 transition-all">Costuri</button>
-            <button onclick="switchSection('guide')" id="nav-guide" class="flex-1 py-4 text-[10px] font-black uppercase tracking-widest border-b-2 border-transparent text-gray-400 transition-all">Ghid Local</button>
+        <nav class="flex border-b sticky top-0 bg-white/80 backdrop-blur-md z-50">
+            <button onclick="switchTab('itinerary')" id="tab-itinerary" class="flex-1 py-4 text-xs font-bold uppercase tracking-widest active-tab">Itinerariu</button>
+            <button onclick="switchTab('budget')" id="tab-budget" class="flex-1 py-4 text-xs font-bold uppercase tracking-widest text-slate-400">Buget</button>
+            <button onclick="switchTab('tips')" id="tab-tips" class="flex-1 py-4 text-xs font-bold uppercase tracking-widest text-slate-400">Ghid</button>
         </nav>
 
-        <main class="flex-1 p-6">
-            
-            <div id="section-plan" class="tab-section active">
-                <div class="flex gap-3 overflow-x-auto no-scrollbar pb-8 pt-2">
-                    <button onclick="setDay(1)" id="btn-d1" class="day-btn flex-shrink-0 w-16 h-16 rounded-3xl bg-gray-50 flex flex-col items-center justify-center transition-all btn-day-active">
-                        <span class="text-[8px] font-black opacity-40 uppercase">Ziua</span><span class="text-xl font-black">01</span>
+        <main class="flex-1 p-5">
+            <div id="section-itinerary" class="tab-content block">
+                <div class="flex gap-2 overflow-x-auto no-scrollbar pb-6">
+                    <button onclick="showDay(1)" id="btn-1" class="day-btn flex-shrink-0 w-12 h-16 rounded-2xl bg-blue-600 text-white flex flex-col items-center justify-center shadow-lg transition-all">
+                        <span class="text-[8px] font-bold opacity-70 uppercase">Zi</span><span class="text-lg font-black leading-none">01</span>
                     </button>
-                    <button onclick="setDay(2)" id="btn-d2" class="day-btn flex-shrink-0 w-16 h-16 rounded-3xl bg-gray-50 flex flex-col items-center justify-center transition-all">
-                        <span class="text-[8px] font-black opacity-40 uppercase">Ziua</span><span class="text-xl font-black">02</span>
+                    <button onclick="showDay(2)" id="btn-2" class="day-btn flex-shrink-0 w-12 h-16 rounded-2xl bg-white border border-slate-200 text-slate-500 flex flex-col items-center justify-center transition-all">
+                        <span class="text-[8px] font-bold opacity-70 uppercase">Zi</span><span class="text-lg font-black leading-none">02</span>
                     </button>
-                    <button onclick="setDay(3)" id="btn-d3" class="day-btn flex-shrink-0 w-16 h-16 rounded-3xl bg-gray-50 flex flex-col items-center justify-center transition-all">
-                        <span class="text-[8px] font-black opacity-40 uppercase">Ziua</span><span class="text-xl font-black">03</span>
+                    <button onclick="showDay(3)" id="btn-3" class="day-btn flex-shrink-0 w-12 h-16 rounded-2xl bg-white border border-slate-200 text-slate-500 flex flex-col items-center justify-center transition-all">
+                        <span class="text-[8px] font-bold opacity-70 uppercase">Zi</span><span class="text-lg font-black leading-none">03</span>
                     </button>
-                    <button onclick="setDay(4)" id="btn-d4" class="day-btn flex-shrink-0 w-16 h-16 rounded-3xl bg-gray-50 flex flex-col items-center justify-center transition-all">
-                        <span class="text-[8px] font-black opacity-40 uppercase">Ziua</span><span class="text-xl font-black">04</span>
+                    <button onclick="showDay(4)" id="btn-4" class="day-btn flex-shrink-0 w-12 h-16 rounded-2xl bg-white border border-slate-200 text-slate-500 flex flex-col items-center justify-center transition-all">
+                        <span class="text-[8px] font-bold opacity-70 uppercase">Zi</span><span class="text-lg font-black leading-none">04</span>
                     </button>
-                    <button onclick="setDay(5)" id="btn-d5" class="day-btn flex-shrink-0 w-16 h-16 rounded-3xl bg-gray-50 flex flex-col items-center justify-center transition-all">
-                        <span class="text-[8px] font-black opacity-40 uppercase">Ziua</span><span class="text-xl font-black">05</span>
+                    <button onclick="showDay(5)" id="btn-5" class="day-btn flex-shrink-0 w-12 h-16 rounded-2xl bg-white border border-slate-200 text-slate-500 flex flex-col items-center justify-center transition-all">
+                        <span class="text-[8px] font-bold opacity-70 uppercase">Zi</span><span class="text-lg font-black leading-none">05</span>
                     </button>
-                    <button onclick="setDay(6)" id="btn-d6" class="day-btn flex-shrink-0 w-16 h-16 rounded-3xl bg-gray-50 flex flex-col items-center justify-center transition-all">
-                        <span class="text-[8px] font-black opacity-40 uppercase">Ziua</span><span class="text-xl font-black">06</span>
+                    <button onclick="showDay(6)" id="btn-6" class="day-btn flex-shrink-0 w-12 h-16 rounded-2xl bg-white border border-slate-200 text-slate-500 flex flex-col items-center justify-center transition-all">
+                        <span class="text-[8px] font-bold opacity-70 uppercase">Zi</span><span class="text-lg font-black leading-none">06</span>
                     </button>
-                    <button onclick="setDay(7)" id="btn-d7" class="day-btn flex-shrink-0 w-16 h-16 rounded-3xl bg-gray-50 flex flex-col items-center justify-center transition-all">
-                        <span class="text-[8px] font-black opacity-40 uppercase">Ziua</span><span class="text-xl font-black">07</span>
+                    <button onclick="showDay(7)" id="btn-7" class="day-btn flex-shrink-0 w-12 h-16 rounded-2xl bg-white border border-slate-200 text-slate-500 flex flex-col items-center justify-center transition-all">
+                        <span class="text-[8px] font-bold opacity-70 uppercase">Zi</span><span class="text-lg font-black leading-none">07</span>
                     </button>
                 </div>
 
-                <div id="day-box-1" class="day-content active">
-                    <div class="bg-gradient-to-br from-orange-50 to-white rounded-[40px] p-8 border border-orange-100 mb-8 shadow-sm">
-                        <h3 class="text-2xl font-black text-gray-900 leading-none">Arrival & Kalamaki</h3>
-                        <p class="text-[10px] font-black text-orange-600 uppercase tracking-widest mt-3">Logistica: Taxi Aeroport</p>
+                <div id="day-1" class="day-panel active">
+                    <div class="mb-6 flex items-center justify-between">
+                        <h2 class="text-2xl font-bold">Sosire & Kalamaki</h2>
+                        <span class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-full uppercase italic">Explorare</span>
                     </div>
-                    <div class="space-y-10 pl-4 relative before:absolute before:left-0 before:top-2 before:bottom-2 before:w-px before:bg-gray-100">
-                        <div class="relative">
-                            <div class="absolute -left-[21px] top-1 w-3 h-3 rounded-full bg-orange-500 border-2 border-white"></div>
-                            <span class="text-[10px] font-black text-gray-300 uppercase">09:00 AM</span>
-                            <h4 class="font-extrabold text-gray-800 text-lg">Aterizare</h4>
-                            <p class="text-sm text-gray-500 mt-1 leading-relaxed">Preluăm bagajele și ne grupăm la ieșire pentru taxiuri spre Kalamaki.</p>
+                    <div class="space-y-4">
+                        <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex gap-4">
+                            <div class="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center text-orange-600 flex-shrink-0"><i data-lucide="plane-landing"></i></div>
+                            <div><h4 class="font-bold">Aterizare (09:00)</h4><p class="text-xs text-slate-500">Transfer spre Hektor's Studios, Kalamaki.</p></div>
                         </div>
-                        <div class="relative">
-                            <div class="absolute -left-[21px] top-1 w-3 h-3 rounded-full bg-blue-500 border-2 border-white"></div>
-                            <span class="text-[10px] font-black text-gray-300 uppercase">13:00 PM</span>
-                            <h4 class="font-extrabold text-gray-800 text-lg">Check-in & Prânz</h4>
-                            <p class="text-sm text-gray-500 mt-1 leading-relaxed">Hektor's Studios. Mergem să mâncăm la Merlis Taverna.</p>
+                        <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex gap-4">
+                            <div class="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600 flex-shrink-0"><i data-lucide="utensils"></i></div>
+                            <div><h4 class="font-bold">Prânz la Merlis</h4><p class="text-xs text-slate-500">Prima masă autentică grecească în grup.</p></div>
                         </div>
-                    </div>
-                </div>
-
-                <div id="day-box-2" class="day-content">
-                    <div class="bg-gradient-to-br from-blue-50 to-white rounded-[40px] p-8 border border-blue-100 mb-8 shadow-sm">
-                        <h3 class="text-2xl font-black text-gray-900 leading-none">Boat Day Adventure</h3>
-                        <p class="text-[10px] font-black text-blue-600 uppercase tracking-widest mt-3">Focus: Marathonisi Island</p>
-                    </div>
-                    <div class="space-y-6">
-                        <div class="p-6 bg-white rounded-3xl shadow-sm border border-gray-100">
-                            <h4 class="font-black text-gray-800 uppercase text-xs mb-2 tracking-widest">Planul de bătaie</h4>
-                            <p class="text-sm text-gray-500 leading-relaxed italic">Închiriem 2 bărci de 5 persoane (Agios Sostis). Vizităm Marathonisi (Insula Țestoaselor) și Keri Caves.</p>
-                        </div>
-                        <div class="p-4 bg-blue-600 rounded-3xl text-white text-center font-black text-xs uppercase tracking-widest">
-                            🍻 Nu uitați să luăm un cooler cu apă și bere!
+                        <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex gap-4">
+                            <div class="w-10 h-10 bg-teal-100 rounded-xl flex items-center justify-center text-teal-600 flex-shrink-0"><i data-lucide="camera"></i></div>
+                            <div><h4 class="font-bold">Apus la Cameo Island</h4><p class="text-xs text-slate-500">Plimbare la apus pe faimosul pod de lemn.</p></div>
                         </div>
                     </div>
                 </div>
 
-                <div id="day-box-5" class="day-content">
-                    <div class="bg-gradient-to-br from-green-50 to-white rounded-[40px] p-8 border border-green-100 mb-8 shadow-sm">
-                        <h3 class="text-2xl font-black text-gray-900 leading-none">Wild West Coast</h3>
-                        <p class="text-[10px] font-black text-green-700 uppercase tracking-widest mt-3">Focus: Shipwreck View</p>
+                <div id="day-2" class="day-panel">
+                    <div class="mb-6 flex items-center justify-between">
+                        <h2 class="text-2xl font-bold">Ziua cu Barca</h2>
+                        <span class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-full uppercase italic">Activitate</span>
                     </div>
-                    <div class="space-y-6">
-                        <div class="flex gap-4 p-5 bg-gray-50 rounded-[32px] border border-gray-100">
-                            <div class="w-12 h-12 bg-white rounded-2xl shadow-sm flex items-center justify-center text-xl">🚗</div>
-                            <div>
-                                <h4 class="font-bold text-gray-800 leading-none">Preluare Mașini</h4>
-                                <p class="text-xs text-gray-400 mt-1">2 mașini din Kalamaki la ora 09:00.</p>
-                            </div>
+                    <div class="bg-blue-600 p-5 rounded-[2rem] text-white mb-6">
+                        <h4 class="font-black uppercase text-[10px] tracking-widest opacity-80">Important</h4>
+                        <p class="text-sm mt-2">Închiriem 2 bărci private (nu e nevoie de permis). Plecare din Agios Sostis.</p>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex gap-4">
+                            <div class="w-10 h-10 bg-sky-100 rounded-xl flex items-center justify-center text-sky-600 flex-shrink-0"><i data-lucide="anchor"></i></div>
+                            <div><h4 class="font-bold">Marathonisi Island</h4><p class="text-xs text-slate-500">Snorkeling și relaxare pe insula țestoaselor.</p></div>
                         </div>
-                        <div class="p-6 bg-white rounded-[32px] border border-gray-100">
-                            <h4 class="font-black text-green-800 text-sm mb-2 uppercase">Oprire principală: Porto Limnionas</h4>
-                            <p class="text-sm text-gray-500 leading-relaxed">Cel mai spectaculos loc de înot și sărituri. După amiază mergem la Navagio Viewpoint pentru pozele iconice.</p>
+                        <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex gap-4">
+                            <div class="w-10 h-10 bg-sky-100 rounded-xl flex items-center justify-center text-sky-600 flex-shrink-0"><i data-lucide="waves"></i></div>
+                            <div><h4 class="font-bold">Keri Caves</h4><p class="text-xs text-slate-500">Explorăm peșterile azur cu barca.</p></div>
                         </div>
                     </div>
                 </div>
 
-                <div id="day-box-rest" class="day-content hidden text-center py-20">
-                    <div class="text-4xl mb-4 opacity-30">🏖️</div>
-                    <h3 class="text-xl font-bold text-gray-400 uppercase tracking-tighter">Relaxare sau Explorare</h3>
-                    <p class="text-xs text-gray-300 mt-2 px-10">Zile libere pentru plajă în Kalamaki, shopping în Zante Town sau o seară lungă în Laganas.</p>
+                <div id="day-5" class="day-panel">
+                    <div class="mb-6 flex items-center justify-between">
+                        <h2 class="text-2xl font-bold">Roadtrip Coasta de Vest</h2>
+                        <span class="text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded-full uppercase italic">Adventure</span>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex gap-4">
+                            <div class="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center text-green-600 flex-shrink-0"><i data-lucide="car"></i></div>
+                            <div><h4 class="font-bold">Preluare mașini</h4><p class="text-xs text-slate-500">Avem 2 mașini închiriate din Kalamaki.</p></div>
+                        </div>
+                        <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex gap-4">
+                            <div class="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center text-green-600 flex-shrink-0"><i data-lucide="mountain"></i></div>
+                            <div><h4 class="font-bold">Porto Limnionas</h4><p class="text-xs text-slate-500">Sărituri în apă și peșteri.</p></div>
+                        </div>
+                        <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex gap-4">
+                            <div class="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center text-green-600 flex-shrink-0"><i data-lucide="image"></i></div>
+                            <div><h4 class="font-bold">Navagio Viewpoint</h4><p class="text-xs text-slate-500">Vedere de sus asupra plajei naufragiului.</p></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="day-generic" class="day-panel">
+                    <div class="flex flex-col items-center justify-center py-20 text-slate-300">
+                        <i data-lucide="palm-tree" class="w-16 h-16 mb-4 opacity-20"></i>
+                        <h3 class="text-lg font-bold">Zi de relaxare</h3>
+                        <p class="text-xs text-center px-10 mt-1 uppercase tracking-widest font-semibold opacity-60">Plajă în Kalamaki & Explorare liberă</p>
+                    </div>
                 </div>
             </div>
 
-            <div id="section-budget" class="tab-section">
-                <div class="bg-[#1E293B] p-10 rounded-[48px] text-white mb-8 shadow-2xl relative overflow-hidden">
-                    <div class="absolute top-0 right-0 w-32 h-32 bg-blue-500 opacity-20 rounded-full -mr-10 -mt-10"></div>
-                    <p class="text-[10px] font-black opacity-50 uppercase tracking-[0.4em] mb-4">Total Estimat / Pers</p>
-                    <h3 class="text-5xl font-black leading-none italic">€455</h3>
-                    <div class="mt-6 flex gap-3">
-                        <span class="px-3 py-1 rounded-full bg-white/10 text-[9px] font-bold uppercase tracking-widest text-blue-300 border border-white/10">Cash €150</span>
-                        <span class="px-3 py-1 rounded-full bg-white/10 text-[9px] font-bold uppercase tracking-widest text-green-300 border border-white/10">Card €305</span>
+            <div id="section-budget" class="tab-content hidden">
+                <div class="bg-slate-900 rounded-[2.5rem] p-8 text-white mb-8">
+                    <p class="text-[10px] font-bold opacity-50 uppercase tracking-[0.3em] mb-2">Total Estimat</p>
+                    <div class="flex items-baseline gap-1">
+                        <h3 class="text-5xl font-black">€455</h3>
+                        <span class="text-slate-400 text-sm">/ pers</span>
+                    </div>
+                    <div class="mt-6 h-1 w-full bg-slate-800 rounded-full overflow-hidden">
+                        <div class="h-full bg-blue-500 w-[60%]"></div>
                     </div>
                 </div>
 
+                <div class="space-y-3">
+                    <div class="p-5 bg-white rounded-3xl border border-slate-100 flex justify-between items-center shadow-sm">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center"><i data-lucide="home" class="w-5 h-5 text-slate-400"></i></div>
+                            <span class="font-bold text-slate-700">Cazare (6 nopți)</span>
+                        </div>
+                        <span class="font-black text-blue-600 uppercase tracking-tighter text-lg">€180</span>
+                    </div>
+                    <div class="p-5 bg-white rounded-3xl border border-slate-100 flex justify-between items-center shadow-sm">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center"><i data-lucide="car" class="w-5 h-5 text-slate-400"></i></div>
+                            <span class="font-bold text-slate-700">Transport</span>
+                        </div>
+                        <span class="font-black text-blue-600 uppercase tracking-tighter text-lg">€95</span>
+                    </div>
+                    <div class="p-5 bg-white rounded-3xl border border-slate-100 flex justify-between items-center shadow-sm">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center"><i data-lucide="coffee" class="w-5 h-5 text-slate-400"></i></div>
+                            <span class="font-bold text-slate-700">Mâncare & Distracție</span>
+                        </div>
+                        <span class="font-black text-blue-600 uppercase tracking-tighter text-lg">€180</span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="section-tips" class="tab-content hidden">
+                <h3 class="text-xl font-bold mb-6 flex items-center gap-2">
+                    <i data-lucide="info" class="w-5 h-5 text-blue-600"></i> Ghid Local Kalamaki
+                </h3>
                 <div class="space-y-4">
-                    <div class="flex items-center justify-between p-6 bg-white rounded-[32px] border border-gray-100 shadow-sm">
-                        <div class="flex flex-col"><span class="font-black text-gray-800">Cazare (Hektor's)</span><span class="text-[10px] text-gray-400 uppercase font-bold tracking-widest">6 Nopți</span></div>
-                        <span class="text-lg font-black text-blue-600">€180</span>
+                    <div class="bg-blue-50/50 p-6 rounded-[2rem] border border-blue-100">
+                        <h4 class="font-black text-blue-800 text-sm uppercase tracking-wider mb-2">Merlis Taverna</h4>
+                        <p class="text-sm text-slate-600 leading-relaxed italic">Atmosferă de familie, prețuri bune și fructe de mare proaspete. Recomandat: Mix Grill.</p>
                     </div>
-                    <div class="flex items-center justify-between p-6 bg-white rounded-[32px] border border-gray-100 shadow-sm">
-                        <div class="flex flex-col"><span class="font-black text-gray-800">Bărci & Mașini</span><span class="text-[10px] text-gray-400 uppercase font-bold tracking-widest">Transport</span></div>
-                        <span class="text-lg font-black text-blue-600">€95</span>
-                    </div>
-                    <div class="flex items-center justify-between p-6 bg-white rounded-[32px] border border-gray-100 shadow-sm">
-                        <div class="flex flex-col"><span class="font-black text-gray-800">Food & Fun</span><span class="text-[10px] text-gray-400 uppercase font-bold tracking-widest">Buget Zilnic</span></div>
-                        <span class="text-lg font-black text-blue-600">€180</span>
+                    <div class="bg-slate-50 p-6 rounded-[2rem] border border-slate-200">
+                        <h4 class="font-black text-slate-800 text-sm uppercase tracking-wider mb-2">Cave Bar</h4>
+                        <p class="text-sm text-slate-600 leading-relaxed italic">Construit în stâncă, oferă cel mai frumos view pentru un cocktail la apus.</p>
                     </div>
                 </div>
             </div>
-
-            <div id="section-guide" class="tab-section">
-                <h2 class="text-3xl font-black text-gray-900 mb-8 uppercase tracking-tighter">Locuri de văzut</h2>
-                <div class="space-y-6">
-                    <div class="relative rounded-[40px] overflow-hidden bg-gray-100 h-48 mb-4">
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent z-10 p-8 flex flex-col justify-end">
-                            <h4 class="text-white font-black text-xl">Merlis Taverna</h4>
-                            <p class="text-white/60 text-xs italic">Cea mai bună mâncare din Kalamaki.</p>
-                        </div>
-                    </div>
-                    <div class="p-8 bg-blue-50 rounded-[40px] border border-blue-100">
-                        <h4 class="font-black text-blue-900 text-lg uppercase tracking-tighter">Cave Bar</h4>
-                        <p class="text-sm text-blue-700 leading-relaxed mt-2 opacity-80 italic">O locație unică construită în stâncă, cu vedere la golful Kalamaki. Perfect pentru primul cocktail al serii.</p>
-                    </div>
-                </div>
-            </div>
-
         </main>
 
-        <footer class="p-10 text-center bg-gray-50">
-            <p class="text-[9px] font-black text-gray-300 uppercase tracking-[0.5em]">GodGuard.ro • Zante 2026</p>
+        <footer class="p-8 text-center bg-slate-50 border-t border-slate-100">
+            <p class="text-[10px] font-bold text-slate-300 uppercase tracking-[0.4em]">GodGuard.ro • 2026</p>
         </footer>
     </div>
 
     <script>
-        function switchSection(section) {
-            // Tab Visibility
-            document.querySelectorAll('.tab-section').forEach(s => s.classList.remove('active'));
-            document.getElementById('section-' + section).classList.add('active');
+        // Initialize Icons
+        lucide.createIcons();
+
+        function switchTab(tab) {
+            // Sections
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById('section-' + tab).classList.remove('hidden');
             
-            // Tab Buttons Styling
-            document.querySelectorAll('nav button').forEach(b => {
-                b.classList.remove('border-blue-600', 'text-blue-600');
-                b.classList.add('border-transparent', 'text-gray-400');
-            });
-            document.getElementById('nav-' + section).classList.add('border-blue-600', 'text-blue-600');
-            document.getElementById('nav-' + section).classList.remove('border-transparent', 'text-gray-400');
-            
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            // Buttons
+            document.querySelectorAll('nav button').forEach(el => el.classList.remove('active-tab', 'text-slate-900'));
+            document.querySelectorAll('nav button').forEach(el => el.classList.add('text-slate-400'));
+            document.getElementById('tab-' + tab).classList.add('active-tab');
+            document.getElementById('tab-' + tab).classList.remove('text-slate-400');
         }
 
-        function setDay(d) {
-            // Day Content Visibility
-            document.querySelectorAll('.day-content').forEach(dc => dc.classList.remove('active'));
-            const targetDay = document.getElementById('day-box-' + d);
-            
-            if (targetDay) {
-                targetDay.classList.add('active');
-            } else {
-                document.getElementById('day-box-rest').classList.add('active');
-            }
+        function showDay(d) {
+            // Update Buttons
+            document.querySelectorAll('.day-btn').forEach(el => {
+                el.classList.remove('bg-blue-600', 'text-white', 'shadow-lg');
+                el.classList.add('bg-white', 'text-slate-500', 'border', 'border-slate-200');
+            });
+            const activeBtn = document.getElementById('btn-' + d);
+            activeBtn.classList.add('bg-blue-600', 'text-white', 'shadow-lg');
+            activeBtn.classList.remove('bg-white', 'text-slate-500', 'border', 'border-slate-200');
 
-            // Day Button Styling
-            document.querySelectorAll('.day-btn').forEach(btn => btn.classList.remove('btn-day-active'));
-            document.getElementById('btn-d' + d).classList.add('btn-day-active');
+            // Update Content
+            document.querySelectorAll('.day-panel').forEach(el => el.classList.remove('active'));
+            const target = document.getElementById('day-' + d);
+            if(target) {
+                target.classList.add('active');
+            } else {
+                document.getElementById('day-generic').classList.add('active');
+            }
         }
     </script>
 </body>
