@@ -1,236 +1,636 @@
-<!DOCTYPE html>
-<html lang="ro">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zakynthos 2026 - Itinerariu Complet</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
-        .active-tab { border-bottom: 2px solid #2563eb; color: #2563eb; }
-        .day-panel { display: none; }
-        .day-panel.active { display: block; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-    </style>
-</head>
-<body class="bg-slate-50 text-slate-900">
+import { useState, useEffect, useRef } from “react”;
 
-    <div class="max-w-md mx-auto bg-white min-h-screen shadow-xl flex flex-col border-x border-slate-200">
-        <div class="relative h-64 bg-slate-900 overflow-hidden">
-            <img src="https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&q=80&w=800" class="absolute inset-0 w-full h-full object-cover opacity-60" alt="Zakynthos">
-            <div class="absolute inset-0 bg-gradient-to-t from-slate-900 to-transparent"></div>
-            <div class="absolute bottom-6 left-6 text-white">
-                <div class="flex items-center gap-2 mb-2">
-                    <span class="bg-blue-600 text-[10px] font-bold px-2 py-1 rounded-md uppercase tracking-wider">Iunie 2026</span>
-                </div>
-                <h1 class="text-4xl font-extrabold tracking-tight">Zante Crew</h1>
-                <p class="text-slate-300 text-sm mt-1 flex items-center gap-1">
-                    <i data-lucide="users" class="w-4 h-4"></i> 10 Persoane • GodGuard Official
-                </p>
-            </div>
+const fontLink = document.createElement(“link”);
+fontLink.rel = “stylesheet”;
+fontLink.href = “https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap”;
+document.head.appendChild(fontLink);
+
+const DAYS = [
+{
+day: 1, emoji: “🌊”, accent: “#38bdf8”,
+title: “Sosire & Prima Baie”, subtitle: “Kalamaki Beach”,
+transport: “🚶 Pe jos”, weather: “☀️ 32°C · Vânt slab · Apă 26°C”,
+mapCenter: [37.718, 20.896], mapZoom: 14,
+summary: “Ziua de acomodare. Desfaceți bagajele, respirați aerul grecesc și mergeți direct la plajă. Seara descoperiți strada principală din Laganas.”,
+budget: “35–50€/pers”,
+activities: [
+{
+time: “13:00”, name: “Check-in Hektor’s Studios”, icon: “🏡”,
+coords: [37.717, 20.892], color: “#f59e0b”,
+rating: null, distance: “—”,
+desc: “Cazare tip studio în inima Kalamakiului. Facilități complete: bucătărie, AC, terasă. Proprietarii sunt localnici prietenoși.”,
+details: [
+“Verificați AC și echipamentele bucătăriei înainte de a semna”,
+“Cereți proprietarului o hartă a zonei și recomandări de taverne”,
+“Minimarket la 50m: aprovizionați-vă cu apă (1,5L = 0,50€)”,
+“Parcare gratuită dacă aveți mașinile închiriate deja”
+],
+tip: “💡 Proprietarul știe taverne locale fără prețuri turistice — întrebați-l direct.”,
+cost: “Inclus în cazare”
+},
+{
+time: “15:00”, name: “Kalamaki Beach”, icon: “🏖️”,
+coords: [37.7175, 20.8925], color: “#06b6d4”,
+rating: 4.4, distance: “2 min pe jos”,
+desc: “Primul contact cu Marea Ionică! Nisip fin auriu, apă turcoaz de 26°C, vizibilitate 8–10m sub apă. Plajă protejată Caretta caretta — broaștele cuibăresc pe nisip noaptea.”,
+details: [
+“Sunbed + umbrelă: 20–25€ pentru 2 persoane (toată ziua)”,
+“Alternativă: umbrelă proprie din sat ~10€ — amortizată în 2 zile”,
+“Cuiburi de broaște marcate cu țepușe — ocoliți-le cu grijă!”,
+“Bar pe plajă: smoothie mango 5€, cafea freddo 2,5€, sandwich 4€”,
+“Adâncime gradată — excelent pentru toți înotătorii din grup”
+],
+tip: “💡 Capătul stâng al plajei: mai puțin aglomerat și umbră naturală de la stânci.”,
+cost: “Gratuit sau 20–25€/cuplu sunbed”
+},
+{
+time: “20:00”, name: “Cina în Laganas”, icon: “🍽️”,
+coords: [37.7198, 20.9017], color: “#f97316”,
+rating: null, distance: “2km — taxi 5€ sau 25min pe jos”,
+desc: “Laganas: cea mai animată stațiune din Zakynthos. Taverne cu pește proaspăt, baruri, muzică live. Prima seară de grup în Grecia.”,
+details: [
+“Taverna Nikos: pește la grătar, prețuri corecte, fără meniu turistic”,
+“Cereți ‘fresh fish of the day’ — mai ieftin decât meniul fix”,
+“Vin alb grecesc Assyrtiko: perfect cu fructele de mare, 12–15€/sticlă”,
+“Evitați restaurantele cu poze laminate pe panou de la intrare”,
+“Platouri de mezes pentru grup: 8–12€/pers, mai economic decât individual”
+],
+tip: “💡 Plimbați-vă 10 min înainte de a alege — vedeți unde mănâncă localnicii.”,
+cost: “15–25€/persoană”
+}
+]
+},
+{
+day: 2, emoji: “🐢”, accent: “#34d399”,
+title: “Laganas & Broaștele Țestoase”, subtitle: “Turtle Watching”,
+transport: “🚶 Pe jos / 🚕 Taxi 5€”, weather: “☀️ 33°C · Calm · Apă 26°C”,
+mapCenter: [37.719, 20.908], mapZoom: 14,
+summary: “Dimineața la Laganas Beach, după-amiaza la portul de broaște țestoase. Seara, apus relaxat pe plaja din Kalamaki.”,
+budget: “25–45€/pers”,
+activities: [
+{
+time: “09:00”, name: “Laganas Beach — Dimineața”, icon: “🌅”,
+coords: [37.7198, 20.9017], color: “#f59e0b”,
+rating: 4.3, distance: “2km de la studios”,
+desc: “Laganas are cea mai lungă plajă din Zakynthos (9km). Dimineața devreme e liniștită și aproape goală — ideal pentru o baie lungă și liniștită.”,
+details: [
+“Trezire devreme: plaja e aproape goală până la 10:00”,
+“Snorkel excelent la capătul estic — stânci acoperite de pești”,
+“Chirii jet-ski și parasailing disponibile din 10:00 (~30€/pers)”,
+“Cafenea pe plajă cu mic dejun grecesc complet: 7–10€/pers”,
+“Umbrele mai ieftine decât la Kalamaki: 15–18€/cuplu”
+],
+tip: “💡 Laganas e mai aglomerat după 11:00 — ajungeți devreme pentru loc bun.”,
+cost: “15–18€/cuplu sunbed sau gratuit”
+},
+{
+time: “16:00”, name: “Portul Laganas — Turtle Spot”, icon: “🐢”,
+coords: [37.7200, 20.9050], color: “#10b981”,
+rating: 4.5, distance: “500m de la plajă”,
+desc: “Zona de alimentare a broaștelor Caretta caretta. Din port se văd zilnic broaști care vin la suprafață. Punct de plecare pentru tururi cu barca dedicată.”,
+details: [
+“Tururi dedicate ‘Turtle Watching’: 15–20€/pers, durata 1–2h”,
+“Broaștele vin spontan la suprafață — cel mai bun moment: 16:00–18:00”,
+“NU hrăniți broaștele — amendă 1.000€ + confiscarea echipamentului foto”,
+“Fotografiați cu telefon fără bliț — blițul le deranjează și le dezorientează”,
+“Tururi rezervabile direct la port sau online cu 1–2 zile înainte”
+],
+tip: “💡 Rezervați turul de la portul mic, nu de la agenții din stațiune — 30–40% mai ieftin.”,
+cost: “15–20€/pers pentru tur barcă”
+},
+{
+time: “19:30”, name: “Apus la Kalamaki Beach”, icon: “🌇”,
+coords: [37.7175, 20.8925], color: “#8b5cf6”,
+rating: null, distance: “La studios”,
+desc: “Întoarcere la Kalamaki pentru apusul de soare. Pe timp de vară, soarele apune spectaculos în spatele insulei Cephalonia la orizont.”,
+details: [
+“Apus la ~20:30–21:00 în august — verificați exact în ziua respectivă”,
+“Cocktailuri pe plajă: 6–9€ (Aperol Spritz, Mojito)”,
+“Sesiune foto de grup — lumina aurie e perfectă la 19:30–20:00”,
+“Cina mai târziu în Kalamaki village: taverne mici, mai autentice și mai ieftine”
+],
+tip: “💡 Stați pe plajă și după apus — cerul violet-roșiatic durează 30–40min.”,
+cost: “0€ + opțional cocktail 6–9€”
+}
+]
+},
+{
+day: 3, emoji: “🗺️”, accent: “#a78bfa”,
+title: “Nordul Sălbatic al Insulei”, subtitle: “Xigia · Navagio · Blue Caves”,
+transport: “🚗 Mașini închiriate (obligatoriu)”, weather: “☀️ 31°C · Vânt moderat pe coaste”,
+mapCenter: [37.86, 20.72], mapZoom: 11,
+summary: “Cea mai spectaculoasă zi a vacanței! Ruta nordică: plajă cu sulf, belvederea Navagio, port pescăresc autentic și grotele albastre. Start devreme — 150km total.”,
+budget: “50–70€/pers (fără mașini)”,
+activities: [
+{
+time: “08:30”, name: “Xigia Sulfur Beach”, icon: “🌋”,
+coords: [37.8497, 20.7892], color: “#f59e0b”,
+rating: 4.4, distance: “55km nord — 1h15min”,
+desc: “Plajă secretă cu izvoare naturale de sulf. Apa are efect terapeutic documentat pentru piele și articulații. Acces pe trepte abrupte — spectaculos și unic.”,
+details: [
+“Parcare sus, coborâre pe trepte abrupte: 5–7 minute”,
+“Apa: mix de apă sărată rece + izvoare calde de sulf (28–32°C)”,
+“Miros specific de sulf — normal și inofensiv, nu vă alarmați”,
+“Plajă mică: maxim 50 persoane — ajungeți devreme!”,
+“Efecte benefice pentru piele: 20–30min de baie e suficient”,
+“Nu există facilități — aduceți apă, mâncare și umbrelă proprie”
+],
+tip: “💡 Dacă plaja e plină la sosire, faceți Navagio primul și reveniți după-amiaza.”,
+cost: “Gratuit”
+},
+{
+time: “11:00”, name: “Navagio Belvedere ⚠️”, icon: “🔭”,
+coords: [37.8640, 20.6243], color: “#ef4444”,
+rating: 4.8, distance: “20km vest — 30min”,
+desc: “⚠️ ATENȚIE: Plaja Navagio (Shipwreck Beach) este ÎNCHISĂ în 2026 din cauza riscului de alunecare a stâncilor. Accesul cu barca este INTERZIS. Belvederea de sus rămâne DESCHISĂ și oferă priveliști incredibile de la 300m altitudine.”,
+details: [
+“Belvederea e GRATUITĂ și accesibilă cu mașina pe drum asfaltat”,
+“Parcare limitată — veniți devreme sau așteptați 10–15 minute”,
+“Priveliști 360°: Marea Ionică, stânci albe verticale, nava eșuată vizibilă”,
+“Cea mai fotografiată priveliște din Grecia — merită orice așteptare”,
+“Aduceți apă — nu există magazin sau bar la belvedere”,
+“Balustrade de protecție — nu treceți de ele pentru selfie-uri!”
+],
+tip: “💡 Ora 11:00–12:00 = lumina ideală pentru fotografii. Stați cel puțin 30–40 min.”,
+cost: “Gratuit (belvedere)”
+},
+{
+time: “13:30”, name: “Prânz în Agios Nikolaos”, icon: “🦞”,
+coords: [37.8736, 20.7506], color: “#f97316”,
+rating: 4.3, distance: “35km est — 50min”,
+desc: “Port mic și autentic de pescari în nord-estul insulei. Taverne direct pe apă, pește prins în dimineața zilei, atmosferă relaxată fără turiști în exces.”,
+details: [
+“Taverna Fanos: cel mai recomandat restaurant, prețuri locale corecte”,
+“Meniu de grup: pește întreg + salată + vin local: 20–25€/pers”,
+“Plajă mică de pietriș lângă port: 30min baie după masă”,
+“De aici pleacă bărcile spre Blue Caves — rezervați direct pe loc”,
+“Benzinărie disponibilă în sat — ocazie bună pentru realimentare”
+],
+tip: “💡 Rezervați turul Blue Caves direct de la portul din Agios Nikolaos — 15–18€/pers.”,
+cost: “20–25€/pers prânz + 15–18€ tur opțional”
+},
+{
+time: “15:30”, name: “Blue Caves — Grotele Albastre”, icon: “🔵”,
+coords: [37.8977, 20.7600], color: “#3b82f6”,
+rating: 4.6, distance: “15km nord de Agios Nikolaos”,
+desc: “Formațiuni stâncoase spectaculoase cu apă albastru-electric cauzată de refracția luminii solare prin calcar alb. Turul cu barca intră efectiv în grote.”,
+details: [
+“Tururi disponibile din Agios Nikolaos sau din Cape Skinari”,
+“Durata tur complet: 45–60 min cu opriri în 5–6 grote diferite”,
+“Claritate apă excepțională: 15–20m vizibilitate în grotă”,
+“Cel mai puternic efect albastru: 10:00–14:00 (lumina soarelui direct)”,
+“La 15:30 lumina e mai slabă dar grotele sunt mai puțin aglomerate”,
+“Puteți înota în grotele mai mari — aduceți labe și mască de snorkel”
+],
+tip: “💡 Stați în vârful bărcii pentru fotografii cu peisajul exterior al stâncilor.”,
+cost: “15–20€/pers”
+}
+]
+},
+{
+day: 4, emoji: “🌿”, accent: “#4ade80”,
+title: “Vestul Verde & Sălbatic”, subtitle: “Porto Limnionas · Porto Koukla”,
+transport: “🚗 Mașini închiriate”, weather: “☀️ 32°C · Vânt dinspre vest”,
+mapCenter: [37.73, 20.77], mapZoom: 11,
+summary: “Vestul Zakynthos-ului e dramatic și sălbatic: fiorduri, apă verde-smarald, aproape zero turiști. O zi mai relaxată cu plajă secretă și cină romantică pe malul mării.”,
+budget: “30–45€/pers”,
+activities: [
+{
+time: “10:00”, name: “Porto Limnionas”, icon: “🌊”,
+coords: [37.7667, 20.6717], color: “#06b6d4”,
+rating: 4.6, distance: “40km vest — 55min”,
+desc: “Fiordul secret al Zakynthos. Un canal natural îngust tăiat în stâncă albă cu apă verde-smarald și liniște totală. Unul dintre cele mai frumoase locuri din insulă.”,
+details: [
+“Acces pe trepte tăiate direct în stâncă — ușor, 3–4 minute coborâre”,
+“Apă incredibil de clară: vizibilitate 12–15m în adâncime”,
+“Snorkel EXCEPȚIONAL: pești colorați, octopi, paji de mare”,
+“Nu există sunbeds — aduceți propriile prosoape și rogojini”,
+“Umbra stâncilor: apa e mai răcoroasă dimineața devreme”,
+“Capacitate mică — rar aglomerat, maxim 30 persoane simultan”
+],
+tip: “💡 Aduceți mâncare și apă — nu există facilități. Petreceți cel puțin 2 ore.”,
+cost: “Gratuit”
+},
+{
+time: “13:30”, name: “Prânz în sat tradițional”, icon: “🥙”,
+coords: [37.7800, 20.8100], color: “#f59e0b”,
+rating: null, distance: “25km est — 35min”,
+desc: “Sate din interiorul insulei (Macherado sau Kiliomeno), departe complet de turiști. Taverne cu mâncare casnică grecească autentică: musaka, souvlaki, spanakopita.”,
+details: [
+“Prețuri reale locale — masă completă 10–15€/pers (jumătate față de stațiune)”,
+“Musaka tradițională: 8€ — testul suprem al autenticității bucătăriei grecești”,
+“Feta de casă cu ulei de măsline și oregano: 4€ — de nelipsit”,
+“Vizitați biserica San Nikolaos din Macherado (sec. XIV) — patrimoniu UNESCO”,
+“Vânzare directă: miere, ulei de măsline, oregano și vin de casă Verdea”
+],
+tip: “💡 Dacă vedeți mașini locale parcate în fața unei taverne — intrați fără să citiți meniul.”,
+cost: “10–15€/pers”
+},
+{
+time: “16:00”, name: “Porto Koukla Beach”, icon: “🏝️”,
+coords: [37.6917, 20.8817], color: “#8b5cf6”,
+rating: 4.1, distance: “35km sud — 45min”,
+desc: “Plajă semi-secretă în sudul insulei, protejată de stânci înalte. Nisip alb, apă turcoaz, facilități reduse — exact opusul aglomerației din Laganas.”,
+details: [
+“Plajă liniștită: maxim 100 persoane chiar și în vârf de sezon”,
+“Snorkel bun în dreapta plajei lângă formațiunile stâncoase”,
+“Mică cafenea/bar cu limonată proaspătă și snacks: prețuri corecte”,
+“Apus de soare SPECTACULOS vizibil direct din această plajă”,
+“Parcare gratuită sus pe stâncă, coborâre comodă 2 minute”
+],
+tip: “💡 Rămâneți pentru cină la taverna de deasupra — vedere panoramică excepțională.”,
+cost: “Gratuit”
+},
+{
+time: “20:00”, name: “Cina cu vedere la apus”, icon: “🍷”,
+coords: [37.6917, 20.8817], color: “#ef4444”,
+rating: null, distance: “Deasupra lui Porto Koukla”,
+desc: “Câteva taverne mici pe stânca de deasupra lui Porto Koukla servesc pește proaspăt cu vedere panoramică absolută la Marea Ionică. Seara de grup perfectă.”,
+details: [
+“Rezervare recomandată: sunați cu 1–2h înainte (proprietarii vorbesc engleză de bază)”,
+“Platouri de fructe de mare pentru masă de 10: 18–22€/pers”,
+“Krasi local — vin de casă din butoaie de lemn: 2–3€/pahar mare”,
+“Apusul la ~21:00 în august — stați pe terasă neapărat”,
+“Întoarcere la Kalamaki: 45 min, drumuri de noapte în condiții bune”
+],
+tip: “💡 Comandați souvlaki de pui pentru cei care nu mănâncă fructe de mare.”,
+cost: “18–25€/pers”
+}
+]
+},
+{
+day: 5, emoji: “⛵”, accent: “#fb923c”,
+title: “Ziua cu Barca — Fun at Sea”, subtitle: “Keri Lake · Libertate totală”,
+transport: “🚗 Mașini → Keri Lake”, weather: “☀️ 33°C · Vânt slab — ideal pentru barcă”,
+mapCenter: [37.668, 20.845], mapZoom: 13,
+summary: “Cea mai liberă zi! Închiriați o barcă fără skipper de la Fun at Sea Keri Lake și explorați coastele sudice pe cont propriu. Grote marine, plaje ascunse, libertate totală.”,
+budget: “20–30€/pers (împărțit la 10)”,
+activities: [
+{
+time: “09:00”, name: “Fun at Sea — Keri Lake”, icon: “⛵”,
+coords: [37.6681, 20.8458], color: “#f97316”,
+rating: 4.9, distance: “15km sud de Kalamaki — 20min”,
+desc: “Cea mai bine cotată companie de bărci din Zakynthos cu rating 4.9⭐ din 200+ recenzii verificate. Bărci de 6–8m cu motor 40–60hp, fără permis necesar.”,
+details: [
+“Rezervare OBLIGATORIE în avans: funatsea.gr”,
+“Rezervați cu minim 3–4 zile înainte — august înseamnă sold out rapid”,
+“Prețuri: 150–250€/zi per barcă (la 10 pers = 15–25€ fiecare!)”,
+“Inclus: motor complet, veste de salvare, hartă nautică, ancora”,
+“Instruire la plecare: 15 min demo simplu de la personalul de la bază”,
+“Zălog: 200–300€ pe card (returnat la înapoiere fără incidente)”
+],
+tip: “💡 Rezervați dimineața devreme (ora 09:00) pentru a maximiza ziua pe apă.”,
+cost: “150–250€/barcă total”
+},
+{
+time: “10:00”, name: “Explorare coaste sudice”, icon: “🗺️”,
+coords: [37.6550, 20.8900], color: “#06b6d4”,
+rating: null, distance: “Navigație liberă”,
+desc: “Cu barca proprie, explorați coastele de sud: grote marine, peșteri luminoase și plaje accesibile EXCLUSIV cu barca — inaccesibile pe uscat.”,
+details: [
+“Grota Keri: intrare cu barca — acustică și luminozitate spectaculoase”,
+“Plaje fără acces terestru între Keri și Gerakas (3–4 golfuri secrete)”,
+“Porto Limnionas accesibil din exterior cu barca — vedere diferită”,
+“Ancoraj liber în orice baie protejată — nu depășiți zona marcată pe hartă”,
+“Adâncimea minimă pentru motor: 1m — atenție la stânci submarine”,
+“Harta completă a zonelor restricționate = inclusă în dotarea bărcii”
+],
+tip: “💡 NU navigați în golful Laganas — zonă marină protejată cu restricții stricte și amenzi.”,
+cost: “Inclus în chirie”
+},
+{
+time: “13:00”, name: “Prânz ancorați în golf secret”, icon: “🥗”,
+coords: [37.662, 20.860], color: “#10b981”,
+rating: null, distance: “Pe mare — alegeți voi locul”,
+desc: “Âncorați într-un golf liniștit și serviți prânzul pe punte cu picioarele în apă. Cel mai memorabil picnic al vieții voastre.”,
+details: [
+“Pregătiți coșul de picnic de la supermarket cu seara înainte”,
+“Recomandări esențiale: pâine cu feta, roșii cherry, măsline, șuncă, fructe”,
+“Bere rece în ladă frigorifică portabilă — absolut esențial la 33°C”,
+“Înotați direct din barcă — adâncime 3–5m în golfurile liniștite”,
+“Echipament snorkel: pești multicolori, caracatițe și stele de mare garantate”
+],
+tip: “💡 Cumpărați totul de la supermarket cu seara înainte — dimineața nu aveți timp.”,
+cost: “10–15€/pers (picnic preparat)”
+},
+{
+time: “17:00”, name: “Returnare barcă la Keri Lake”, icon: “🔙”,
+coords: [37.6681, 20.8458], color: “#8b5cf6”,
+rating: null, distance: “Keri Lake”,
+desc: “Returnați barca până la ora agreată (de obicei 18:00–19:00). Inspecție vizuală împreună cu personalul și recuperarea zălogului.”,
+details: [
+“Returnare cu minim 30 min înainte de deadline-ul agreat”,
+“Combustibil extra dacă navigați mai mult de 3h: ~20–30€”,
+“Inspecție vizuală completă împreună cu personalul la returnare”,
+“Recuperare zălog: pe loc sau în 3–5 zile bancare pe card”,
+“Cina opțională în Keri Village lângă lac: taverne cu pește de lac (unic în insulă)”
+],
+tip: “💡 Fotografiați barca la preluare și la returnare — dovadă în caz de dispute cu zălogul.”,
+cost: “Combustibil extra: ~20–30€”
+}
+]
+},
+{
+day: 6, emoji: “🐠”, accent: “#2dd4bf”,
+title: “Sudul Verde — Plaje Turtle”, subtitle: “Dafni · Gerakas”,
+transport: “🚗 Mașini închiriate”, weather: “☀️ 33°C · Vânt NV · Apă 27°C”,
+mapCenter: [37.66, 20.91], mapZoom: 13,
+summary: “Cele mai curate plaje din Zakynthos — și unele dintre cele mai frumoase din Grecia. Ambele sunt rezervații marine UNESCO. Broaște Caretta caretta garantate dimineața.”,
+budget: “20–35€/pers”,
+activities: [
+{
+time: “08:30”, name: “Dafni Beach — Dimineața devreme”, icon: “🌿”,
+coords: [37.6667, 20.8833], color: “#10b981”,
+rating: 4.5, distance: “12km sud de Kalamaki — 20min”,
+desc: “Plajă de cuibărit protejată UNESCO. Dimineața devreme există șanse mari să vedeți broaștele care se întorc în mare după cuibărit sau urmele proaspete pe nisip.”,
+details: [
+“Program de acces: 07:00–19:30 (intrarea noaptea este strict INTERZISĂ)”,
+“Dimineața: urmele de la noaptea trecută sunt vizibile pe nisip”,
+“Voluntari ARCHELON prezenți — puteți întreba despre monitorizare”,
+“Sunbeds disponibile din 08:30: 20€/cuplu pentru toată ziua”,
+“Nicio construcție permanentă pe plajă — autenticitate totală prezervată”,
+“Snorkel extraordinar în dreapta plajei — stânci cu viață marină bogată”
+],
+tip: “💡 Mergeți la 08:30 — mai devreme decât turiștii și cu lumina de dimineață superbă.”,
+cost: “Gratuit sau 20€/cuplu sunbed”
+},
+{
+time: “12:00”, name: “Gerakas Beach”, icon: “🦀”,
+coords: [37.6550, 20.9183], color: “#f59e0b”,
+rating: 4.7, distance: “8km est de Dafni — 15min”,
+desc: “Considerată top 5 plaje din toată Grecia. Stânci calcaroase galbene dramatice, nisip fin, apă turcoaz-verde. Protejată ca rezervație de cuibărit — broaște vizibile frecvent.”,
+details: [
+“Două sectoare: sector strict protejat (fără sunbed) + sector liber”,
+“Nu intrați cu câini — rezervație marină cu reglementări stricte”,
+“Snorkel EXCEPȚIONAL în stânga plajei: stânci cu bogăție marină rară”,
+“Chioșc cu limonată proaspătă, apă și sandwichuri la intrare: prețuri corecte”,
+“Parcare gratuită sus, coborâre comodă 5 minute prin pădure”,
+“Vizibilitate apă: 12–15m — una dintre cele mai clare din insulă”
+],
+tip: “💡 Combinați cu picnic — peisajul e atât de frumos că nu veți vrea să plecați.”,
+cost: “Gratuit”
+},
+{
+time: “17:00”, name: “Întoarcere prin Vasilikos Village”, icon: “🏘️”,
+coords: [37.6950, 20.9100], color: “#a78bfa”,
+rating: null, distance: “Pe drum spre Kalamaki”,
+desc: “Vasilikos: sat tradițional cu o brutărie locală, supermarket mic și taverna de cartier. Perfect pentru aprovizionare și ultimele cumpărături.”,
+details: [
+“Brutăria locală: pâine cu măsline, spanakopita proaspătă la cuptor”,
+“Supermarket mic: aprovizionare pentru ultima zi”,
+“Taverna centrală: souvlaki și tzatziki la prețuri 100% locale”,
+“Vânzare directă: miere de insulă, ulei de măsline extra-virgin, oregano”,
+“Ultimă benzinărie înainte de a returna mașinile închiriate mâine”
+],
+tip: “💡 Cumpărați miere și ulei din Zakynthos ca suveniruri — calitate excepțională, certificată.”,
+cost: “5–20€/pers cumpărături opționale”
+}
+]
+},
+{
+day: 7, emoji: “🏛️”, accent: “#f472b6”,
+title: “Zakynthos Town & Plecare”, subtitle: “Oraș · Muzeu · Amintiri”,
+transport: “🚕 Taxi 12€ / 🚌 KTEL 2€”, weather: “☀️ 31°C · Cer senin”,
+mapCenter: [37.789, 20.900], mapZoom: 14,
+summary: “Ultima zi — cel mai frumos oraș din insulele ionice. Arhitectură veneționară, muzeu bizantin, piață centrală, shopping de suveniruri. Zbor de seară sau dimineața ulterioară.”,
+budget: “30–55€/pers”,
+activities: [
+{
+time: “10:00”, name: “Piața Solomos”, icon: “🏛️”,
+coords: [37.7893, 20.8997], color: “#f472b6”,
+rating: 4.5, distance: “12km nord — taxi 12€ sau KTEL 2€”,
+desc: “Inima orașului Zakynthos. Piața principală numită după poetul național Dionysios Solomos — autorul imnului național grec. Arhitectură veneționară reconstruită cu fidelitate după marele cutremur din 1953.”,
+details: [
+“Autobuz KTEL Kalamaki–Zakynthos Town: 2€/pers, la fiecare 30–60min”,
+“Statuia lui Solomos în centrul pieței — fotografii obligatorii de grup”,
+“Cafenele tradiționale: freddo espresso 2,5€, bougatsa (plăcintă cu cremă) 3€”,
+“Muzicieni stradali dimineața — atmosferă grecească autentică incomparabilă”,
+“Plimbare de 15 min de-a lungul falezei: vedere la portul principal”
+],
+tip: “💡 Stați la o cafenea cu terasă și observați — ritmul grec de dimineață e incomparabil.”,
+cost: “2€ transport + cafea/petit déjeuner 5–8€”
+},
+{
+time: “11:30”, name: “Muzeul Bizantin Zakynthos”, icon: “🎨”,
+coords: [37.7893, 20.9003], color: “#8b5cf6”,
+rating: 4.4, distance: “200m de Piața Solomos”,
+desc: “Colecție excepțională de icoane bizantine, sculptură și fresce salvate din bisericile distruse complet de cutremurul catastrofal din 1953. Istoria vie și emoționantă a insulei.”,
+details: [
+“Program: 08:30–15:00 (atenție: LUNI ÎNCHIS)”,
+“Bilet intrare: 4€/pers, gratuit pentru persoane sub 18 ani”,
+“Durata medie a vizitei: 45–60 minute”,
+“Maqueta orașului Zakynthos înainte de 1953 — fascinantă și emoționantă”,
+“Ghid audio disponibil în engleză: 2€ extra — recomandat pentru context”,
+“Magazin mic cu reproduceri de icoane și cărți de artă bizantină”
+],
+tip: “💡 Chiar dacă nu sunteți fani muzee — maqueta pre-cutremur singură merită prețul biletului.”,
+cost: “4€/pers”
+},
+{
+time: “13:30”, name: “Prânz & Shopping Strada Roma”, icon: “🛍️”,
+coords: [37.7888, 20.8990], color: “#f59e0b”,
+rating: null, distance: “Centrul orașului”,
+desc: “Strada comercială principală — taverne cu specific local, cofetării cu mandolato (nuga tradițională de Zakynthos), magazine cu produse artizanale.”,
+details: [
+“Mandolato: nuga tradițională cu nuci, unică în Grecia — cel mai bun suvenir!”,
+“Pasteli (tablă de susan cu miere): 3–5€/bucată — excelent cadou de dus acasă”,
+“Prânz la Malanos Restaurant: stabilit de 80+ ani, mâncare tradițională autentică”,
+“Verdea: vin alb unic produs exclusiv în Zakynthos — sticla 8–12€”,
+“Magazine cu ceramică, bijuterii de argint și iconițe hand-made”
+],
+tip: “💡 Mandolato autentic: cumpărați de la fabricile Xanthopoulos sau Kafkas, nu din magazine turistice.”,
+cost: “15–25€ prânz + suveniruri după buget”
+},
+{
+time: “16:00”, name: “Fortul Strani — Ultima Priveliște”, icon: “🏰”,
+coords: [37.7940, 20.8970], color: “#ef4444”,
+rating: 4.3, distance: “500m nord de piață — 10min pe jos”,
+desc: “Fortăreața veneționă de pe dealul din spatele orașului. De sus: priveliște panoramică 360° asupra Zakynthos Town, portului și întregii Mări Ionice. Ultimul cadru de grup.”,
+details: [
+“Acces gratuit sau bilet mic de 2€ (verificați la intrare)”,
+“Urcuș 15–20 min pe trepte în umbra copacilor — ușor pentru toată lumea”,
+“Cea mai bună priveliște: 16:00–17:30 cu lumina de după-amiază”,
+“Rămășițe de tunuri venețiene — interes istoric documentat”,
+“Zonă verde extinsă: perfect pentru relaxare și ultima sesiune foto de grup”
+],
+tip: “💡 Ultima fotografie de grup din înălțime — cea mai frumoasă amintire colectivă.”,
+cost: “Gratuit sau 2€”
+}
+]
+}
+];
+
+// ─── MAP COMPONENT ────────────────────────────────────────────────────────────
+function DayMap({ day }) {
+const mapRef = useRef(null);
+const mapInstanceRef = useRef(null);
+const markersRef = useRef([]);
+const [loaded, setLoaded] = useState(!!window.L);
+
+useEffect(() => {
+if (window.L) { setLoaded(true); return; }
+const link = document.createElement(“link”);
+link.rel = “stylesheet”;
+link.href = “https://unpkg.com/leaflet@1.9.4/dist/leaflet.css”;
+document.head.appendChild(link);
+const script = document.createElement(“script”);
+script.src = “https://unpkg.com/leaflet@1.9.4/dist/leaflet.js”;
+script.onload = () => setLoaded(true);
+document.head.appendChild(script);
+}, []);
+
+useEffect(() => {
+if (!loaded || !mapRef.current) return;
+const L = window.L;
+if (!mapInstanceRef.current) {
+mapInstanceRef.current = L.map(mapRef.current, { scrollWheelZoom: false });
+L.tileLayer(“https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png”, {
+attribution: “© OpenStreetMap contributors”, maxZoom: 18
+}).addTo(mapInstanceRef.current);
+}
+const map = mapInstanceRef.current;
+markersRef.current.forEach(m => m.remove());
+markersRef.current = [];
+const bounds = [];
+day.activities.forEach((act, i) => {
+if (!act.coords) return;
+const c = act.color || “#38bdf8”;
+const icon = L.divIcon({
+className: “”,
+html: `<div style="background:${c};color:#fff;width:30px;height:30px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2.5px solid #fff;box-shadow:0 3px 8px rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;font-family:sans-serif"><span style="transform:rotate(45deg)">${i + 1}</span></div>`,
+iconSize: [30, 30], iconAnchor: [15, 30], popupAnchor: [0, -32]
+});
+const m = L.marker(act.coords, { icon }).addTo(map)
+.bindPopup(`<div style="font-family:'DM Sans',sans-serif;font-size:13px"><b>${act.icon} ${act.name}</b><br><span style="color:#888">${act.time}</span></div>`);
+markersRef.current.push(m);
+bounds.push(act.coords);
+});
+if (bounds.length > 1) map.fitBounds(bounds, { padding: [45, 45] });
+else if (bounds.length === 1) map.setView(bounds[0], day.mapZoom);
+else map.setView(day.mapCenter, day.mapZoom);
+setTimeout(() => map.invalidateSize(), 150);
+}, [loaded, day]);
+
+return (
+<div style={{ borderRadius: 16, overflow: “hidden”, border: “1px solid rgba(255,255,255,0.1)”, boxShadow: “0 8px 32px rgba(0,0,0,0.5)” }}>
+{!loaded && (
+<div style={{ height: 300, background: “#1e293b”, display: “flex”, flexDirection: “column”, alignItems: “center”, justifyContent: “center”, gap: 10 }}>
+<div style={{ fontSize: 28 }}>🗺️</div>
+<div style={{ color: “#64748b”, fontFamily: “‘DM Sans’,sans-serif”, fontSize: 14 }}>Se încarcă harta interactivă…</div>
+</div>
+)}
+<div ref={mapRef} style={{ height: 300, display: loaded ? “block” : “none” }} />
+<div style={{ background: “#0f172a”, padding: “10px 14px”, display: “flex”, gap: 6, flexWrap: “wrap”, borderTop: “1px solid rgba(255,255,255,0.06)” }}>
+{day.activities.map((act, i) => (
+<span key={i} style={{ display: “inline-flex”, alignItems: “center”, gap: 5, background: act.color + “18”, border: `1px solid ${act.color}40`, padding: “3px 10px”, borderRadius: 20, fontSize: 11.5, fontFamily: “‘DM Sans’,sans-serif”, color: “#e2e8f0” }}>
+<span style={{ background: act.color, color: “#fff”, borderRadius: “50%”, width: 17, height: 17, display: “inline-flex”, alignItems: “center”, justifyContent: “center”, fontSize: 9, fontWeight: 800 }}>{i + 1}</span>
+{act.name}
+</span>
+))}
+</div>
+</div>
+);
+}
+
+// ─── ACTIVITY CARD ────────────────────────────────────────────────────────────
+function ActivityCard({ act, accent }) {
+const [open, setOpen] = useState(false);
+return (
+<div style={{ background: open ? “rgba(255,255,255,0.06)” : “rgba(255,255,255,0.03)”, borderRadius: 14, border: `1px solid ${open ? act.color + "50" : "rgba(255,255,255,0.07)"}`, marginBottom: 10, overflow: “hidden”, transition: “all 0.2s” }}>
+<button onClick={() => setOpen(o => !o)} style={{ width: “100%”, background: “none”, border: “none”, cursor: “pointer”, padding: “14px 16px”, display: “flex”, alignItems: “center”, gap: 12, textAlign: “left” }}>
+<div style={{ background: act.color + “20”, border: `1.5px solid ${act.color}60`, borderRadius: 12, width: 44, height: 44, display: “flex”, alignItems: “center”, justifyContent: “center”, fontSize: 22, flexShrink: 0 }}>{act.icon}</div>
+<div style={{ flex: 1, minWidth: 0 }}>
+<div style={{ display: “flex”, alignItems: “center”, gap: 6, flexWrap: “wrap”, marginBottom: 3 }}>
+<span style={{ color: act.color, fontFamily: “‘DM Sans’,sans-serif”, fontSize: 12, fontWeight: 600 }}>{act.time}</span>
+{act.rating && <span style={{ background: “#fbbf2420”, color: “#fbbf24”, fontSize: 11, padding: “2px 7px”, borderRadius: 20, fontFamily: “‘DM Sans’,sans-serif”, fontWeight: 600 }}>⭐ {act.rating}</span>}
+{act.distance && act.distance !== “—” && <span style={{ background: “rgba(255,255,255,0.06)”, color: “#94a3b8”, fontSize: 11, padding: “2px 7px”, borderRadius: 20, fontFamily: “‘DM Sans’,sans-serif” }}>📍 {act.distance}</span>}
+</div>
+<div style={{ color: “#f1f5f9”, fontFamily: “‘DM Sans’,sans-serif”, fontWeight: 600, fontSize: 14.5, whiteSpace: “nowrap”, overflow: “hidden”, textOverflow: “ellipsis” }}>{act.name}</div>
+</div>
+<div style={{ color: “#475569”, fontSize: 20, transition: “transform 0.25s”, transform: open ? “rotate(90deg)” : “rotate(0deg)”, flexShrink: 0 }}>›</div>
+</button>
+{open && (
+<div style={{ padding: “4px 16px 16px”, borderTop: “1px solid rgba(255,255,255,0.06)” }}>
+<p style={{ color: “#cbd5e1”, fontFamily: “‘DM Sans’,sans-serif”, fontSize: 13.5, lineHeight: 1.7, margin: “12px 0 10px” }}>{act.desc}</p>
+<ul style={{ margin: “0 0 12px”, paddingLeft: 18 }}>
+{act.details.map((d, i) => (
+<li key={i} style={{ color: “#94a3b8”, fontFamily: “‘DM Sans’,sans-serif”, fontSize: 13, lineHeight: 1.65, marginBottom: 5 }}>{d}</li>
+))}
+</ul>
+<div style={{ background: `${act.color}15`, border: `1px solid ${act.color}35`, borderRadius: 10, padding: “10px 14px”, marginBottom: 10, fontFamily: “‘DM Sans’,sans-serif”, fontSize: 13, color: “#e2e8f0”, lineHeight: 1.55 }}>{act.tip}</div>
+<span style={{ background: “#10b98120”, color: “#34d399”, padding: “4px 12px”, borderRadius: 20, fontSize: 12, fontFamily: “‘DM Sans’,sans-serif”, fontWeight: 600, display: “inline-block” }}>💰 {act.cost}</span>
+</div>
+)}
+</div>
+);
+}
+
+// ─── MAIN ─────────────────────────────────────────────────────────────────────
+export default function App() {
+const [sel, setSel] = useState(0);
+const day = DAYS[sel];
+
+return (
+<div style={{ minHeight: “100vh”, background: “#020617”, paddingBottom: 60 }}>
+{/* Header */}
+<div style={{ background: “linear-gradient(160deg,#0c1a4e 0%,#0f172a 55%,#020617 100%)”, padding: “28px 16px 22px”, textAlign: “center”, borderBottom: “1px solid rgba(255,255,255,0.05)” }}>
+<div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 4, color: “#38bdf8”, textTransform: “uppercase”, marginBottom: 8, fontFamily: “‘DM Sans’,sans-serif” }}>Zakynthos · August 2026 · Grup 10 Persoane</div>
+<h1 style={{ fontFamily: “‘Playfair Display’,serif”, color: “#f8fafc”, fontSize: “clamp(22px,5vw,36px)”, margin: “0 0 5px”, fontWeight: 900, letterSpacing: -0.5 }}>Hektor’s Studios Kalamaki</h1>
+<div style={{ color: “#475569”, fontSize: 13, fontFamily: “‘DM Sans’,sans-serif” }}>Plan complet · 7 zile · Toate activitățile detaliate</div>
+<div style={{ display: “flex”, justifyContent: “center”, gap: 10, marginTop: 16, flexWrap: “wrap” }}>
+{[“🏖️ 4 plaje top”, “⛵ 1 zi cu barca”, “🗺️ Ruta nordică”, “🐢 Broaște țestoase”].map(t => (
+<span key={t} style={{ background: “rgba(255,255,255,0.06)”, color: “#94a3b8”, padding: “4px 12px”, borderRadius: 20, fontSize: 12, fontFamily: “‘DM Sans’,sans-serif” }}>{t}</span>
+))}
+</div>
+</div>
+
+```
+  {/* Day Tabs */}
+  <div style={{ position: "sticky", top: 0, zIndex: 100, background: "#020617dd", backdropFilter: "blur(10px)", borderBottom: "1px solid rgba(255,255,255,0.05)", overflowX: "auto", padding: "10px 12px", display: "flex", gap: 7, scrollbarWidth: "none" }}>
+    {DAYS.map((d, i) => (
+      <button key={i} onClick={() => setSel(i)} style={{ background: sel === i ? d.accent : "rgba(255,255,255,0.05)", color: sel === i ? "#020617" : "#94a3b8", border: "none", cursor: "pointer", padding: "8px 15px", borderRadius: 50, fontFamily: "'DM Sans',sans-serif", fontWeight: 700, fontSize: 13, whiteSpace: "nowrap", transition: "all 0.2s", flexShrink: 0, boxShadow: sel === i ? `0 4px 16px ${d.accent}55` : "none" }}>
+        {d.emoji} Ziua {d.day}
+      </button>
+    ))}
+  </div>
+
+  {/* Content */}
+  <div style={{ maxWidth: 680, margin: "0 auto", padding: "18px 14px" }}>
+
+    {/* Day Card */}
+    <div style={{ background: `linear-gradient(135deg,${day.accent}12,rgba(255,255,255,0.02))`, border: `1px solid ${day.accent}25`, borderRadius: 18, padding: "18px 18px 16px", marginBottom: 18 }}>
+      <div style={{ display: "flex", gap: 14, alignItems: "flex-start", marginBottom: 12 }}>
+        <div style={{ background: day.accent + "20", border: `1.5px solid ${day.accent}40`, borderRadius: 14, width: 52, height: 52, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26, flexShrink: 0 }}>{day.emoji}</div>
+        <div>
+          <div style={{ color: day.accent, fontFamily: "'DM Sans',sans-serif", fontSize: 11, fontWeight: 700, letterSpacing: 2.5, textTransform: "uppercase", marginBottom: 3 }}>Ziua {day.day} · {day.subtitle}</div>
+          <h2 style={{ fontFamily: "'Playfair Display',serif", color: "#f8fafc", fontSize: "clamp(18px,4vw,24px)", margin: 0, fontWeight: 700, lineHeight: 1.2 }}>{day.title}</h2>
         </div>
-
-        <nav class="flex border-b sticky top-0 bg-white/80 backdrop-blur-md z-50">
-            <button onclick="switchTab('itinerary')" id="tab-itinerary" class="flex-1 py-4 text-xs font-bold uppercase tracking-widest active-tab">Itinerariu</button>
-            <button onclick="switchTab('budget')" id="tab-budget" class="flex-1 py-4 text-xs font-bold uppercase tracking-widest text-slate-400">Buget</button>
-            <button onclick="switchTab('tips')" id="tab-tips" class="flex-1 py-4 text-xs font-bold uppercase tracking-widest text-slate-400">Ghid</button>
-        </nav>
-
-        <main class="flex-1 p-5">
-            <div id="section-itinerary" class="tab-content block">
-                <div class="flex gap-2 overflow-x-auto no-scrollbar pb-6">
-                    <button onclick="showDay(1)" id="btn-1" class="day-btn flex-shrink-0 w-12 h-16 rounded-2xl bg-blue-600 text-white flex flex-col items-center justify-center shadow-lg transition-all">
-                        <span class="text-[8px] font-bold opacity-70 uppercase">Zi</span><span class="text-lg font-black leading-none">01</span>
-                    </button>
-                    <button onclick="showDay(2)" id="btn-2" class="day-btn flex-shrink-0 w-12 h-16 rounded-2xl bg-white border border-slate-200 text-slate-500 flex flex-col items-center justify-center transition-all">
-                        <span class="text-[8px] font-bold opacity-70 uppercase">Zi</span><span class="text-lg font-black leading-none">02</span>
-                    </button>
-                    <button onclick="showDay(3)" id="btn-3" class="day-btn flex-shrink-0 w-12 h-16 rounded-2xl bg-white border border-slate-200 text-slate-500 flex flex-col items-center justify-center transition-all">
-                        <span class="text-[8px] font-bold opacity-70 uppercase">Zi</span><span class="text-lg font-black leading-none">03</span>
-                    </button>
-                    <button onclick="showDay(4)" id="btn-4" class="day-btn flex-shrink-0 w-12 h-16 rounded-2xl bg-white border border-slate-200 text-slate-500 flex flex-col items-center justify-center transition-all">
-                        <span class="text-[8px] font-bold opacity-70 uppercase">Zi</span><span class="text-lg font-black leading-none">04</span>
-                    </button>
-                    <button onclick="showDay(5)" id="btn-5" class="day-btn flex-shrink-0 w-12 h-16 rounded-2xl bg-white border border-slate-200 text-slate-500 flex flex-col items-center justify-center transition-all">
-                        <span class="text-[8px] font-bold opacity-70 uppercase">Zi</span><span class="text-lg font-black leading-none">05</span>
-                    </button>
-                    <button onclick="showDay(6)" id="btn-6" class="day-btn flex-shrink-0 w-12 h-16 rounded-2xl bg-white border border-slate-200 text-slate-500 flex flex-col items-center justify-center transition-all">
-                        <span class="text-[8px] font-bold opacity-70 uppercase">Zi</span><span class="text-lg font-black leading-none">06</span>
-                    </button>
-                    <button onclick="showDay(7)" id="btn-7" class="day-btn flex-shrink-0 w-12 h-16 rounded-2xl bg-white border border-slate-200 text-slate-500 flex flex-col items-center justify-center transition-all">
-                        <span class="text-[8px] font-bold opacity-70 uppercase">Zi</span><span class="text-lg font-black leading-none">07</span>
-                    </button>
-                </div>
-
-                <div id="day-1" class="day-panel active">
-                    <div class="mb-6 flex items-center justify-between">
-                        <h2 class="text-2xl font-bold">Sosire & Kalamaki</h2>
-                        <span class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-full uppercase italic">Explorare</span>
-                    </div>
-                    <div class="space-y-4">
-                        <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex gap-4">
-                            <div class="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center text-orange-600 flex-shrink-0"><i data-lucide="plane-landing"></i></div>
-                            <div><h4 class="font-bold">Aterizare (09:00)</h4><p class="text-xs text-slate-500">Transfer spre Hektor's Studios, Kalamaki.</p></div>
-                        </div>
-                        <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex gap-4">
-                            <div class="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600 flex-shrink-0"><i data-lucide="utensils"></i></div>
-                            <div><h4 class="font-bold">Prânz la Merlis</h4><p class="text-xs text-slate-500">Prima masă autentică grecească în grup.</p></div>
-                        </div>
-                        <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex gap-4">
-                            <div class="w-10 h-10 bg-teal-100 rounded-xl flex items-center justify-center text-teal-600 flex-shrink-0"><i data-lucide="camera"></i></div>
-                            <div><h4 class="font-bold">Apus la Cameo Island</h4><p class="text-xs text-slate-500">Plimbare la apus pe faimosul pod de lemn.</p></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="day-2" class="day-panel">
-                    <div class="mb-6 flex items-center justify-between">
-                        <h2 class="text-2xl font-bold">Ziua cu Barca</h2>
-                        <span class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-full uppercase italic">Activitate</span>
-                    </div>
-                    <div class="bg-blue-600 p-5 rounded-[2rem] text-white mb-6">
-                        <h4 class="font-black uppercase text-[10px] tracking-widest opacity-80">Important</h4>
-                        <p class="text-sm mt-2">Închiriem 2 bărci private (nu e nevoie de permis). Plecare din Agios Sostis.</p>
-                    </div>
-                    <div class="space-y-4">
-                        <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex gap-4">
-                            <div class="w-10 h-10 bg-sky-100 rounded-xl flex items-center justify-center text-sky-600 flex-shrink-0"><i data-lucide="anchor"></i></div>
-                            <div><h4 class="font-bold">Marathonisi Island</h4><p class="text-xs text-slate-500">Snorkeling și relaxare pe insula țestoaselor.</p></div>
-                        </div>
-                        <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex gap-4">
-                            <div class="w-10 h-10 bg-sky-100 rounded-xl flex items-center justify-center text-sky-600 flex-shrink-0"><i data-lucide="waves"></i></div>
-                            <div><h4 class="font-bold">Keri Caves</h4><p class="text-xs text-slate-500">Explorăm peșterile azur cu barca.</p></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="day-5" class="day-panel">
-                    <div class="mb-6 flex items-center justify-between">
-                        <h2 class="text-2xl font-bold">Roadtrip Coasta de Vest</h2>
-                        <span class="text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded-full uppercase italic">Adventure</span>
-                    </div>
-                    <div class="space-y-4">
-                        <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex gap-4">
-                            <div class="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center text-green-600 flex-shrink-0"><i data-lucide="car"></i></div>
-                            <div><h4 class="font-bold">Preluare mașini</h4><p class="text-xs text-slate-500">Avem 2 mașini închiriate din Kalamaki.</p></div>
-                        </div>
-                        <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex gap-4">
-                            <div class="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center text-green-600 flex-shrink-0"><i data-lucide="mountain"></i></div>
-                            <div><h4 class="font-bold">Porto Limnionas</h4><p class="text-xs text-slate-500">Sărituri în apă și peșteri.</p></div>
-                        </div>
-                        <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex gap-4">
-                            <div class="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center text-green-600 flex-shrink-0"><i data-lucide="image"></i></div>
-                            <div><h4 class="font-bold">Navagio Viewpoint</h4><p class="text-xs text-slate-500">Vedere de sus asupra plajei naufragiului.</p></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="day-generic" class="day-panel">
-                    <div class="flex flex-col items-center justify-center py-20 text-slate-300">
-                        <i data-lucide="palm-tree" class="w-16 h-16 mb-4 opacity-20"></i>
-                        <h3 class="text-lg font-bold">Zi de relaxare</h3>
-                        <p class="text-xs text-center px-10 mt-1 uppercase tracking-widest font-semibold opacity-60">Plajă în Kalamaki & Explorare liberă</p>
-                    </div>
-                </div>
-            </div>
-
-            <div id="section-budget" class="tab-content hidden">
-                <div class="bg-slate-900 rounded-[2.5rem] p-8 text-white mb-8">
-                    <p class="text-[10px] font-bold opacity-50 uppercase tracking-[0.3em] mb-2">Total Estimat</p>
-                    <div class="flex items-baseline gap-1">
-                        <h3 class="text-5xl font-black">€455</h3>
-                        <span class="text-slate-400 text-sm">/ pers</span>
-                    </div>
-                    <div class="mt-6 h-1 w-full bg-slate-800 rounded-full overflow-hidden">
-                        <div class="h-full bg-blue-500 w-[60%]"></div>
-                    </div>
-                </div>
-
-                <div class="space-y-3">
-                    <div class="p-5 bg-white rounded-3xl border border-slate-100 flex justify-between items-center shadow-sm">
-                        <div class="flex items-center gap-4">
-                            <div class="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center"><i data-lucide="home" class="w-5 h-5 text-slate-400"></i></div>
-                            <span class="font-bold text-slate-700">Cazare (6 nopți)</span>
-                        </div>
-                        <span class="font-black text-blue-600 uppercase tracking-tighter text-lg">€180</span>
-                    </div>
-                    <div class="p-5 bg-white rounded-3xl border border-slate-100 flex justify-between items-center shadow-sm">
-                        <div class="flex items-center gap-4">
-                            <div class="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center"><i data-lucide="car" class="w-5 h-5 text-slate-400"></i></div>
-                            <span class="font-bold text-slate-700">Transport</span>
-                        </div>
-                        <span class="font-black text-blue-600 uppercase tracking-tighter text-lg">€95</span>
-                    </div>
-                    <div class="p-5 bg-white rounded-3xl border border-slate-100 flex justify-between items-center shadow-sm">
-                        <div class="flex items-center gap-4">
-                            <div class="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center"><i data-lucide="coffee" class="w-5 h-5 text-slate-400"></i></div>
-                            <span class="font-bold text-slate-700">Mâncare & Distracție</span>
-                        </div>
-                        <span class="font-black text-blue-600 uppercase tracking-tighter text-lg">€180</span>
-                    </div>
-                </div>
-            </div>
-
-            <div id="section-tips" class="tab-content hidden">
-                <h3 class="text-xl font-bold mb-6 flex items-center gap-2">
-                    <i data-lucide="info" class="w-5 h-5 text-blue-600"></i> Ghid Local Kalamaki
-                </h3>
-                <div class="space-y-4">
-                    <div class="bg-blue-50/50 p-6 rounded-[2rem] border border-blue-100">
-                        <h4 class="font-black text-blue-800 text-sm uppercase tracking-wider mb-2">Merlis Taverna</h4>
-                        <p class="text-sm text-slate-600 leading-relaxed italic">Atmosferă de familie, prețuri bune și fructe de mare proaspete. Recomandat: Mix Grill.</p>
-                    </div>
-                    <div class="bg-slate-50 p-6 rounded-[2rem] border border-slate-200">
-                        <h4 class="font-black text-slate-800 text-sm uppercase tracking-wider mb-2">Cave Bar</h4>
-                        <p class="text-sm text-slate-600 leading-relaxed italic">Construit în stâncă, oferă cel mai frumos view pentru un cocktail la apus.</p>
-                    </div>
-                </div>
-            </div>
-        </main>
-
-        <footer class="p-8 text-center bg-slate-50 border-t border-slate-100">
-            <p class="text-[10px] font-bold text-slate-300 uppercase tracking-[0.4em]">GodGuard.ro • 2026</p>
-        </footer>
+      </div>
+      <p style={{ color: "#94a3b8", fontFamily: "'DM Sans',sans-serif", fontSize: 13.5, lineHeight: 1.7, margin: "0 0 14px" }}>{day.summary}</p>
+      <div style={{ display: "flex", gap: 7, flexWrap: "wrap" }}>
+        <span style={{ background: "rgba(255,255,255,0.07)", color: "#cbd5e1", padding: "4px 12px", borderRadius: 20, fontSize: 12, fontFamily: "'DM Sans',sans-serif", fontWeight: 500 }}>{day.weather}</span>
+        <span style={{ background: "rgba(255,255,255,0.07)", color: "#cbd5e1", padding: "4px 12px", borderRadius: 20, fontSize: 12, fontFamily: "'DM Sans',sans-serif", fontWeight: 500 }}>{day.transport}</span>
+        <span style={{ background: "#10b98118", color: "#34d399", padding: "4px 12px", borderRadius: 20, fontSize: 12, fontFamily: "'DM Sans',sans-serif", fontWeight: 700 }}>💰 {day.budget}</span>
+      </div>
     </div>
 
-    <script>
-        // Initialize Icons
-        lucide.createIcons();
+    {/* Map */}
+    <div style={{ marginBottom: 20 }}>
+      <div style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 11, fontWeight: 700, letterSpacing: 2.5, color: "#475569", textTransform: "uppercase", marginBottom: 10 }}>🗺️ Harta interactivă — Ziua {day.day}</div>
+      <DayMap key={day.day} day={day} />
+    </div>
 
-        function switchTab(tab) {
-            // Sections
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.getElementById('section-' + tab).classList.remove('hidden');
-            
-            // Buttons
-            document.querySelectorAll('nav button').forEach(el => el.classList.remove('active-tab', 'text-slate-900'));
-            document.querySelectorAll('nav button').forEach(el => el.classList.add('text-slate-400'));
-            document.getElementById('tab-' + tab).classList.add('active-tab');
-            document.getElementById('tab-' + tab).classList.remove('text-slate-400');
-        }
+    {/* Activities */}
+    <div>
+      <div style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 11, fontWeight: 700, letterSpacing: 2.5, color: "#475569", textTransform: "uppercase", marginBottom: 12 }}>📋 Activități — {day.activities.length} obiective · Click pentru detalii</div>
+      {day.activities.map((act, i) => (
+        <ActivityCard key={`${day.day}-${i}`} act={act} accent={day.accent} />
+      ))}
+    </div>
 
-        function showDay(d) {
-            // Update Buttons
-            document.querySelectorAll('.day-btn').forEach(el => {
-                el.classList.remove('bg-blue-600', 'text-white', 'shadow-lg');
-                el.classList.add('bg-white', 'text-slate-500', 'border', 'border-slate-200');
-            });
-            const activeBtn = document.getElementById('btn-' + d);
-            activeBtn.classList.add('bg-blue-600', 'text-white', 'shadow-lg');
-            activeBtn.classList.remove('bg-white', 'text-slate-500', 'border', 'border-slate-200');
+  </div>
+</div>
+```
 
-            // Update Content
-            document.querySelectorAll('.day-panel').forEach(el => el.classList.remove('active'));
-            const target = document.getElementById('day-' + d);
-            if(target) {
-                target.classList.add('active');
-            } else {
-                document.getElementById('day-generic').classList.add('active');
-            }
-        }
-    </script>
-</body>
-</html>
+);
+}
